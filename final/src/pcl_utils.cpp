@@ -17,8 +17,21 @@
 #include <pcl/console/parse.h>
 #include <pcl/pcl_config.h>
 #include <pcl/filters/statistical_outlier_removal.h>
+#include <iostream>
+#include <thread>
+#include <pcl/common/common_headers.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/console/parse.h>
+#include <chrono>
 
 #include "../include/pcl_utils.h"
+
+using namespace std::literals;
+using namespace std::literals::chrono_literals;
+using namespace std::chrono_literals;
+extern pcl::visualization::PCLVisualizer::Ptr viewer;
 
 //plane 
 float dist_thold = 0.01;
@@ -83,4 +96,68 @@ void extract_largest_plane(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud,pcl::PointC
   extract.filter (*cloud_plane);
   std::cout << "PointCloud representing the planar component: " <<cloud_plane->points.size () << " data points." << std::endl;
 
+}
+
+
+
+pcl::visualization::PCLVisualizer::Ptr viewportsVis (
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1, 
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2,
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud3,
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud4)
+{
+  // --------------------------------------------------------
+  // -----Open 3D viewer and add point cloud and normals-----
+  // --------------------------------------------------------
+  pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
+  viewer->initCameraParameters ();
+
+  int v1(0);
+  viewer->createViewPort(0.0, 0.5, 0.5, 1.0, v1);
+  viewer->setBackgroundColor (0, 0, 0, v1);
+  viewer->addText("RAW_POINTCLOUD", 10, 10, "v1 text", v1);
+  pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_color1(cloud1, 255, 255, 255);
+  viewer->addPointCloud<pcl::PointXYZ> (cloud1, single_color1, "sample cloud1",v1);
+
+  int v2(0);
+  viewer->createViewPort(0.5, 1, 0.5, 1.0, v2);
+  viewer->setBackgroundColor (10, 10, 10, v2);
+  viewer->addText("FILTERED_POINTCLOUD", 10, 10, "v2 text", v2);
+  pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_color2(cloud2, 55, 55, 55);
+  viewer->addPointCloud<pcl::PointXYZ> (cloud2, single_color2, "sample cloud2",v2);
+
+  int v3(0);
+  viewer->createViewPort(0.0, 0.5, 0.0, 0.5, v3);
+  viewer->setBackgroundColor (0, 0, 0, v3);
+  viewer->addText("PLANE_POINTCLOUD", 10, 10, "v3 text", v3);
+  pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_color3(cloud3, 125, 125, 125);
+  viewer->addPointCloud<pcl::PointXYZ> (cloud3, single_color3, "sample cloud3",v3);
+
+  int v4(0);
+    viewer->createViewPort(0.5, 1.0, 0.0, 0.5, v4);
+    viewer->setBackgroundColor (0, 0, 0, v4);
+    viewer->addText("NEW_POINTCLOUD", 10, 10, "v4 text", v4);
+    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ>   single_color4(cloud4, 185, 185, 185);
+    viewer->addPointCloud<pcl::PointXYZ> (cloud4, single_color4, "sample  cloud4",v4);
+
+
+  viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud1");
+  viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud2");
+  viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud3");
+  viewer->setPointCloudRenderingProperties  (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud4");
+  
+  viewer->addCoordinateSystem (1.0);
+
+  return (viewer);
+}
+
+void display_4_clouds_inf( pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1, 
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2,
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud3,
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud4){
+  viewer = viewportsVis(cloud1,cloud2,cloud3,cloud4);
+  while (!viewer->wasStopped ()){
+        viewer->spinOnce (100);
+        std::this_thread::sleep_for(100ms);
+  }
 }
