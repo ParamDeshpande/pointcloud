@@ -1,0 +1,7 @@
+/home/zero/workspace/final/build/CMakeFiles/install/strip.dir
+/home/zero/workspace/final/build/CMakeFiles/install/local.dir
+/home/zero/workspace/final/build/CMakeFiles/edit_cache.dir
+/home/zero/workspace/final/build/CMakeFiles/main.dir
+/home/zero/workspace/final/build/CMakeFiles/rebuild_cache.dir
+/home/zero/workspace/final/build/CMakeFiles/list_install_components.dir
+/home/zero/workspace/final/build/CMakeFiles/install.dir
