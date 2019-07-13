@@ -8,8 +8,11 @@ in data and op in /out.
 
 ### Installing
 
-move to build folder 
-use
+move to build folder ie (depending on your file location)
+```
+  cd Downloads/pointcloud/build
+```
+and then use
 ```
   cmake ..
 ```
